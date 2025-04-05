@@ -21,10 +21,10 @@ exports.register = async (req, res, next) => {
     }
 
     // Verify university email domain
-    const emailDomain = email.split('@')[1];
-    if (emailDomain !== uni.emailDomain) {
-      return next(new ErrorResponse(`Please use your ${uni.name} email`, 400));
-    }
+    // const emailDomain = email.split('@')[1];
+    // if (emailDomain !== uni.emailDomain) {
+    //   return next(new ErrorResponse(`Please use your ${uni.name} email`, 400));
+    // }
 
     // Create user
     const user = await User.create({
