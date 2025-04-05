@@ -198,7 +198,7 @@ exports.deletePost = async (req, res, next) => {
     // Delete all replies associated with the post
     await Reply.deleteMany({ post: post._id });
 
-    await post.remove();
+    await post.deleteOne();
 
     res.status(200).json({
       success: true,
