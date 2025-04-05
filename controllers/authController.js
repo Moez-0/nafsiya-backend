@@ -136,13 +136,17 @@ exports.verifyAccount = async (req, res, next) => {
     user.verificationToken = undefined;
     user.verificationTokenExpires = undefined;
     await user.save();
-
-    res.status(200).json({
-      success: true,
-      data: 'Account verified successfully'
-    });
+    
+    // res.status(200).json({
+    //   success: true,
+    //   data: 'Account verified successfully'
+    // });
+    //redirect to login page
+    res.redirect(`https://nafsiya.tn/login?verified=true`);
   } catch (err) {
+
     next(err);
+    
   }
 };
 
