@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const University = require('../models/University');
 const ErrorResponse = require('../utils/errorResponse');
-const sendEmail = require('../utils/emailService');
+const {sendEmail , generateVerificationEmail} = require('../utils/emailService');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
@@ -46,12 +46,12 @@ exports.register = async (req, res, next) => {
     // Send verification email
     const verificationUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/verify/${verificationToken}`;
     const message = `Please verify your account by clicking on the link: ${verificationUrl}`;
-
     try {
       await sendEmail({
         email: user.email,
         subject: 'Nafsiya Account Verification',
-        message
+        message: message, // Plain text fallback
+        html: generateVerificationEmail(user.firstName +' ' + user.lastName, verificationUrl) // HTML content
       });
 
       res.status(200).json({
