@@ -80,7 +80,7 @@ exports.updatePreferences = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Delete user account
+// @desc    Delete user account 
 // @route   DELETE /api/v1/auth/account
 // @access  Private
 exports.deleteAccount = asyncHandler(async (req, res) => {

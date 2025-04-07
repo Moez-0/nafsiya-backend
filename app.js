@@ -12,6 +12,9 @@ const errorHandler = require('./middlewares/errorHandler');
 // Route files
 const authRoutes = require('./routes/authRoutes');
 const forumRoutes = require('./routes/forumRoutes');
+const userRoutes = require('./routes/userRoutes');
+const resourceRoutes = require('./routes/resourceRoutes');
+
 
 const app = express();
 
@@ -50,6 +53,8 @@ app.use(cookieParser());
 // 9. Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/forum', forumRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/resources', resourceRoutes);
 
 // 10. Error handler (should be last)
 app.use(errorHandler);

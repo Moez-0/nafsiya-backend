@@ -1,5 +1,6 @@
 const ForumPost = require('../models/ForumPost');
 const Reply = require('../models/Reply');
+const Activity = require('../models/Activity');
 const ErrorResponse = require('../utils/errorResponse');
 
 // @desc    Get all forum posts
@@ -118,14 +119,24 @@ exports.getPost = async (req, res, next) => {
 // @route   POST /api/v1/forum
 // @access  Private or Anonymous
 exports.createPost = async (req, res, next) => {
+
+  
   try {
     // Add user to req.body if logged in
     if (req.user) {
       req.body.user = req.user.id;
     }
-
+    
     const post = await ForumPost.create(req.body);
-
+  // Log activity if user is logged in
+  if (req.user) {
+    await Activity.create({
+      user: req.user.id,
+      type: 'post',
+      description: `Created a new post: ${post.title}`,
+      relatedPost: post._id
+    });
+  }
     res.status(201).json({
       success: true,
       data: post
@@ -229,7 +240,16 @@ exports.createReply = async (req, res, next) => {
       { $push: { replies: reply._id } },
       { new: true, runValidators: true }
     );
-
+    // Log activity if user is logged in
+    if (req.user) {
+      await Activity.create({
+        user: req.user.id,
+        type: 'reply',
+        description: `Replied to a post`,
+        relatedPost: req.params.id,
+        relatedReply: reply._id
+      });
+    }
     res.status(201).json({
       success: true,
       data: reply

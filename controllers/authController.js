@@ -2,6 +2,7 @@ const User = require('../models/User');
 const University = require('../models/University');
 const ErrorResponse = require('../utils/errorResponse');
 const {sendEmail , generateVerificationEmail} = require('../utils/emailService');
+const Activity = require('../models/Activity');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
@@ -105,7 +106,12 @@ exports.login = async (req, res, next) => {
 
     // Create token
     const token = user.getSignedJwtToken();
-
+     // Log login activity
+  await Activity.create({
+    user: user._id,
+    type: 'login',
+    description: 'Logged in to the system'
+  });
     res.status(200).json({
       success: true,
       token
