@@ -35,15 +35,15 @@ exports.getResource = async (req, res, next) => {
       new ErrorResponse(`Resource not found with id of ${req.params.id}`, 404)
     );
   }
-// Log activity if user is logged in
-if (req.user) {
-    await Activity.create({
-      user: req.user.id,
-      type: 'resource_view',
-      description: `Viewed resource: ${resource.title}`,
-      relatedResource: resource._id
-    });
-  }
+    // Log activity if user is logged in
+    if (req.user) {
+        await Activity.create({
+        user: req.user.id,
+        type: 'resource_view',
+        description: `Viewed resource: ${resource.title}`,
+        relatedResource: resource._id
+        });
+    }
   res.status(200).json({
     success: true,
     data: resource

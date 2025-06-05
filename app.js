@@ -14,6 +14,8 @@ const authRoutes = require('./routes/authRoutes');
 const forumRoutes = require('./routes/forumRoutes');
 const userRoutes = require('./routes/userRoutes');
 const resourceRoutes = require('./routes/resourceRoutes');
+const specialistsRoutes = require('./routes/specialistsRoutes');
+const paymentsRoutes = require('./routes/paymentsRoutes');
 
 
 const app = express();
@@ -55,6 +57,9 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/forum', forumRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/resources', resourceRoutes);
+app.use('/api/v1/specialists', specialistsRoutes);
+app.use('/api/v1/payments', paymentsRoutes);
+
 
 // 10. Error handler (should be last)
 app.use(errorHandler);

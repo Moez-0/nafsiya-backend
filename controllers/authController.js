@@ -36,7 +36,8 @@ exports.register = async (req, res, next) => {
       university: uni._id,
       studentId,
       phone,
-      graduationYear
+      graduationYear,
+      role: 'user', // Default role
     });
 
     // Create verification token
