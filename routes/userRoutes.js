@@ -5,7 +5,8 @@ const {
     getUserActivity,
     updateMood,
     getMe,
-    updateUser
+    updateUser,
+    getUserById
   } = require('../controllers/userController');
 // User routes
 router.route('/activity/:id')
@@ -17,6 +18,12 @@ router.route('/mood')
 router.route('/me')
   .get(protect, getMe)
   .put(protect, updateUser);
+
+router.route('/:id')
+  .get(protect, getUserById);
+  
+
+  
 
 
 // Export the router

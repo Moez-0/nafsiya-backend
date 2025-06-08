@@ -16,7 +16,7 @@ const userRoutes = require('./routes/userRoutes');
 const resourceRoutes = require('./routes/resourceRoutes');
 const specialistsRoutes = require('./routes/specialistsRoutes');
 const paymentsRoutes = require('./routes/paymentsRoutes');
-
+const agoraRoutes = require('./routes/agoraRoutes');
 
 const app = express();
 
@@ -59,6 +59,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/resources', resourceRoutes);
 app.use('/api/v1/specialists', specialistsRoutes);
 app.use('/api/v1/payments', paymentsRoutes);
+app.use('/api/v1/agora', agoraRoutes);
 
 
 // 10. Error handler (should be last)

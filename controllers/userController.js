@@ -100,3 +100,26 @@ exports.updateUser = async (req, res, next) => {
     data: user
   });
 };
+
+
+// @desc    Get public user info by ID
+// @route   GET /api/v1/users/:id
+// @access  Public or Private (adjust middleware as needed)
+
+exports.getUserById = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).select('firstName lastName _id role email phone graduationYear bio profilePicture preferences');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
