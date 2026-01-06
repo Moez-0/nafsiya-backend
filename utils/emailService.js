@@ -6,20 +6,31 @@ const sendEmail = async ({ email, subject, html, message }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Api-Token": process.env.EMAIL_PASSWORD,
+        "Api-Token": process.env.EMAIL_PASSWORD, // Mailtrap API token
       },
       body: JSON.stringify({
-        from: "Nafsiya Support <support@nafsiya.tn>",
-        to: email,
-        subject,
+        from: {
+          name: "Nafsiya Support",
+          email: "support@nafsiya.tn"
+        },
+        to: [
+          {
+            email: email
+          }
+        ],
+        subject: subject,
         html: html || undefined,
         text: message || undefined,
       }),
     });
 
     const data = await res.json();
-    if (!res.ok) console.error("❌ Mailtrap API error:", data);
-    else console.log("📧 Email sent via Mailtrap API");
+
+    if (!res.ok) {
+      console.error("❌ Mailtrap API error:", data);
+    } else {
+      console.log("📧 Email sent via Mailtrap API");
+    }
   } catch (err) {
     console.error("❌ HTTP request failed:", err.message);
   }
