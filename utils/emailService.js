@@ -1,4 +1,3 @@
-const fetch = require("node-fetch"); // make sure to install node-fetch: npm install node-fetch
 
 // Send email via Mailtrap HTTP API
 const sendEmail = async ({ email, subject, html, message }) => {
@@ -7,24 +6,20 @@ const sendEmail = async ({ email, subject, html, message }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Api-Token": process.env.EMAIL_PASSWORD, // Your Mailtrap API token
+        "Api-Token": process.env.EMAIL_PASSWORD,
       },
       body: JSON.stringify({
         from: "Nafsiya Support <support@nafsiya.tn>",
         to: email,
-        subject: subject,
+        subject,
         html: html || undefined,
         text: message || undefined,
       }),
     });
 
     const data = await res.json();
-
-    if (!res.ok) {
-      console.error("❌ Mailtrap API error:", data);
-    } else {
-      console.log("📧 Email sent via Mailtrap API");
-    }
+    if (!res.ok) console.error("❌ Mailtrap API error:", data);
+    else console.log("📧 Email sent via Mailtrap API");
   } catch (err) {
     console.error("❌ HTTP request failed:", err.message);
   }
