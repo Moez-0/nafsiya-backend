@@ -29,7 +29,9 @@ const sendEmail = async options => {
   };
 
   // 3) Actually send the email
-  await transporter.sendMail(mailOptions);
+  transporter.sendMail(mailOptions)
+  .then(() => console.log("📧 Email sent"))
+  .catch(err => console.error("❌ Email failed:", err.message));
 };
 // HTML template generator function
 const generateVerificationEmail = (username, verificationUrl) => `
