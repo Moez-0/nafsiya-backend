@@ -1,39 +1,36 @@
-const nodemailer = require('nodemailer');
+const fetch = require("node-fetch"); // make sure to install node-fetch: npm install node-fetch
 
-const sendEmail = async options => {
-  // 1) Create a transporter
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT),
-    secure: false, // STARTTLS
-    auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-    requireTLS: true,
-    tls: {
-      rejectUnauthorized: true,
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-  });
+// Send email via Mailtrap HTTP API
+const sendEmail = async ({ email, subject, html, message }) => {
+  try {
+    const res = await fetch("https://send.api.mailtrap.io/api/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Api-Token": process.env.EMAIL_PASSWORD, // Your Mailtrap API token
+      },
+      body: JSON.stringify({
+        from: "Nafsiya Support <support@nafsiya.tn>",
+        to: email,
+        subject: subject,
+        html: html || undefined,
+        text: message || undefined,
+      }),
+    });
 
-  // 2) Define the email options
-  const mailOptions = {
-    from: 'Nafsiya Support  <support@nafsiya.tn>',
-    to: options.email,
-    subject: options.subject,
-    text: options.message,
-    html: options.html || null // Use HTML if provided, otherwise fallback to text
-  };
+    const data = await res.json();
 
-  // 3) Actually send the email
-  transporter.sendMail(mailOptions)
-  .then(() => console.log("📧 Email sent"))
-  .catch(err => console.error("❌ Email failed:", err.message));
+    if (!res.ok) {
+      console.error("❌ Mailtrap API error:", data);
+    } else {
+      console.log("📧 Email sent via Mailtrap API");
+    }
+  } catch (err) {
+    console.error("❌ HTTP request failed:", err.message);
+  }
 };
-// HTML template generator function
+
+// HTML template generator (unchanged)
 const generateVerificationEmail = (username, verificationUrl) => `
 <!DOCTYPE html>
 <html>
@@ -74,4 +71,3 @@ const generateVerificationEmail = (username, verificationUrl) => `
 `;
 
 module.exports = { sendEmail, generateVerificationEmail };
-// module.exports = sendEmail;
