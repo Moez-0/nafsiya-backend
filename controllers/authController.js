@@ -16,9 +16,12 @@ exports.register = async (req, res, next) => {
  console.log(req.body);
   try {
     // Check if university exists
-    const uni = await University.findOne({ name: university });
-    if (!uni) {
-      return next(new ErrorResponse('Invalid university', 400));
+   let uni = null;
+    if (university && university !== 'N/A') {
+      uni = await University.findOne({ name: university });
+      if (!uni) {
+        return next(new ErrorResponse('Invalid university', 400));
+      }
     }
 
     // Verify university email domain
@@ -29,16 +32,16 @@ exports.register = async (req, res, next) => {
 
     // Create user
     const user = await User.create({
-      firstName,
-      lastName,
-      email,
-      password,
-      university: uni._id,
-      studentId,
-      phone,
-      graduationYear,
-      role: 'user', // Default role
-    });
+  firstName,
+  lastName,
+  email,
+  password,
+  university: uni ? uni._id : null, // null if not a student
+  studentId: studentId || null,
+  phone,
+  graduationYear: graduationYear || null,
+  role: 'user',
+});
 
     // Create verification token
     const verificationToken = user.getVerificationToken();

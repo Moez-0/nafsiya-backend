@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
-
 const UserSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -32,15 +31,21 @@ const UserSchema = new mongoose.Schema({
     minlength: 8,
     select: false,
   },
+  isNonStudent: {
+    type: Boolean,
+    default: false
+  },
   university: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'University',
-    required: true,
+
+    default: null, // allows null for non-students
   },
   studentId: {
     type: String,
-    required: [true, 'Please provide student ID'],
+
     unique: true,
+    default: null, // allows null for non-students
   },
   phone: {
     type: String,
@@ -48,7 +53,8 @@ const UserSchema = new mongoose.Schema({
   },
   graduationYear: {
     type: Number,
-    required: [true, 'Please provide graduation year'],
+
+    default: null, // allows null for non-students
   },
   isVerified: {
     type: Boolean,
@@ -59,31 +65,13 @@ const UserSchema = new mongoose.Schema({
   passwordResetToken: String,
   passwordResetExpires: Date,
   preferences: {
-    darkMode: {
-      type: Boolean,
-      default: false
-    },
-    language: {
-      type: String,
-      default: 'en'
-    },
+    darkMode: { type: Boolean, default: false },
+    language: { type: String, default: 'en' },
     notifications: {
-      email: {
-        type: Boolean,
-        default: true
-      },
-      app: {
-        type: Boolean,
-        default: true
-      },
-      reminders: {
-        type: Boolean,
-        default: false
-      },
-      updates: {
-        type: Boolean,
-        default: true
-      }
+      email: { type: Boolean, default: true },
+      app: { type: Boolean, default: true },
+      reminders: { type: Boolean, default: false },
+      updates: { type: Boolean, default: true }
     }
   },
   role: {
@@ -105,48 +93,30 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
-// Method to compare passwords
+// Compare passwords
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-
-// Generate verification token
+// Verification token
 UserSchema.methods.getVerificationToken = function() {
-    const verificationToken = crypto.randomBytes(20).toString('hex');
-  
-    // Hash token and set to verificationToken field
-    this.verificationToken = crypto
-      .createHash('sha256')
-      .update(verificationToken)
-      .digest('hex');
-  
-    // Set expire (10 minutes)
-    this.verificationTokenExpires = Date.now() + 10 * 60 * 1000;
-    console.log(verificationToken);
-    return this.verificationToken;
-  };
-  
-  // Generate and hash password token
-  UserSchema.methods.getResetPasswordToken = function() {
-    const resetToken = crypto.randomBytes(20).toString('hex');
-  
-    // Hash token and set to resetPasswordToken field
-    this.resetPasswordToken = crypto
-      .createHash('sha256')
-      .update(resetToken)
-      .digest('hex');
-  
-    // Set expire (10 minutes)
-    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
-  
-    return resetToken;
-  };
-  
-  // Sign JWT and return
-  UserSchema.methods.getSignedJwtToken = function() {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE
-    });
-  };
+  const verificationToken = crypto.randomBytes(20).toString('hex');
+  this.verificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
+  this.verificationTokenExpires = Date.now() + 10 * 60 * 1000;
+  return this.verificationToken;
+};
+
+// Reset password token
+UserSchema.methods.getResetPasswordToken = function() {
+  const resetToken = crypto.randomBytes(20).toString('hex');
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  return resetToken;
+};
+
+// JWT
+UserSchema.methods.getSignedJwtToken = function() {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+};
+
 module.exports = mongoose.model('User', UserSchema);
