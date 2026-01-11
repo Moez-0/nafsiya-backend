@@ -60,6 +60,7 @@ app.use('/api/v1/resources', resourceRoutes);
 app.use('/api/v1/specialists', specialistsRoutes);
 app.use('/api/v1/payments', paymentsRoutes);
 app.use('/api/v1/agora', agoraRoutes);
+app.use('/api/v1/admin', require('./routes/adminRoutes'));
 
 
 // 10. Error handler (should be last)

@@ -43,8 +43,8 @@ const UserSchema = new mongoose.Schema({
   },
   studentId: {
     type: String,
-
     unique: true,
+    sparse: true,
     default: null, // allows null for non-students
   },
   phone: {
@@ -99,7 +99,7 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 // Verification token
-UserSchema.methods.getVerificationToken = function() {
+UserSchema.methods.getVerificationToken = function () {
   const verificationToken = crypto.randomBytes(20).toString('hex');
   this.verificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
   this.verificationTokenExpires = Date.now() + 10 * 60 * 1000;
@@ -107,7 +107,7 @@ UserSchema.methods.getVerificationToken = function() {
 };
 
 // Reset password token
-UserSchema.methods.getResetPasswordToken = function() {
+UserSchema.methods.getResetPasswordToken = function () {
   const resetToken = crypto.randomBytes(20).toString('hex');
   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
@@ -115,7 +115,7 @@ UserSchema.methods.getResetPasswordToken = function() {
 };
 
 // JWT
-UserSchema.methods.getSignedJwtToken = function() {
+UserSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
 };
 

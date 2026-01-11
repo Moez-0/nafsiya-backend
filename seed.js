@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const University = require('./models/University');
+const User = require('./models/User');
 const connectDB = require('./config/db');
 require('dotenv').config();
 
@@ -34,6 +35,22 @@ const importData = async () => {
   try {
     await University.deleteMany();
     await University.insertMany(universities);
+
+    // Create Admin User
+    const adminExists = await User.findOne({ email: 'admin@nafsiya.tn' });
+    if (!adminExists) {
+      await User.create({
+        firstName: 'Super',
+        lastName: 'Admin',
+        email: 'admin@nafsiya.tn',
+        password: 'admin123',
+        role: 'admin',
+        phone: '00000000',
+        isVerified: true
+      });
+      console.log('Admin User Created');
+    }
+
     console.log('Data Imported!');
     process.exit();
   } catch (error) {

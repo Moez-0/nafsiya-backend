@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const University = require('../models/University');
 const ErrorResponse = require('../utils/errorResponse');
-const {sendEmail , generateVerificationEmail} = require('../utils/emailService');
+const { sendEmail, generateVerificationEmail } = require('../utils/emailService');
 const Activity = require('../models/Activity');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -12,11 +12,11 @@ const crypto = require('crypto');
 // @access  Public
 exports.register = async (req, res, next) => {
   const { firstName, lastName, email, password, university, studentId, phone, graduationYear } = req.body;
- console.log(firstName + lastName + email + password + university + studentId + phone + graduationYear);
- console.log(req.body);
+  console.log(firstName + lastName + email + password + university + studentId + phone + graduationYear);
+  console.log(req.body);
   try {
     // Check if university exists
-   let uni = null;
+    let uni = null;
     if (university && university !== 'N/A') {
       uni = await University.findOne({ name: university });
       if (!uni) {
@@ -32,16 +32,16 @@ exports.register = async (req, res, next) => {
 
     // Create user
     const user = await User.create({
-  firstName,
-  lastName,
-  email,
-  password,
-  university: uni ? uni._id : null, // null if not a student
-  studentId: studentId || null,
-  phone,
-  graduationYear: graduationYear || null,
-  role: 'user',
-});
+      firstName,
+      lastName,
+      email,
+      password,
+      university: uni ? uni._id : null, // null if not a student
+      studentId: studentId || null,
+      phone,
+      graduationYear: graduationYear || null,
+      role: 'user',
+    });
 
     // Create verification token
     const verificationToken = user.getVerificationToken();
@@ -56,7 +56,7 @@ exports.register = async (req, res, next) => {
         email: user.email,
         subject: 'Nafsiya Account Verification',
         message: message, // Plain text fallback
-        html: generateVerificationEmail(user.firstName +' ' + user.lastName, verificationUrl) // HTML content
+        html: generateVerificationEmail(user.firstName + ' ' + user.lastName, verificationUrl) // HTML content
       });
 
       res.status(200).json({
@@ -69,7 +69,7 @@ exports.register = async (req, res, next) => {
       console.error(err);
 
       await user.save({ validateBeforeSave: false });
-      
+
       return next(new ErrorResponse('Email could not be sent', 500));
     }
   } catch (err) {
@@ -110,15 +110,16 @@ exports.login = async (req, res, next) => {
 
     // Create token
     const token = user.getSignedJwtToken();
-     // Log login activity
-  await Activity.create({
-    user: user._id,
-    type: 'login',
-    description: 'Logged in to the system'
-  });
+    // Log login activity
+    await Activity.create({
+      user: user._id,
+      type: 'login',
+      description: 'Logged in to the system'
+    });
     res.status(200).json({
       success: true,
-      token
+      token,
+      data: user
     });
   } catch (err) {
     next(err);
@@ -130,12 +131,12 @@ exports.login = async (req, res, next) => {
 // @access  Public
 exports.verifyAccount = async (req, res, next) => {
   const { verificationToken } = req.params;
-  
+
 
   try {
     const user = await User.findOne({
       verificationToken,
-      
+
     });
 
     if (!user) {
@@ -146,7 +147,7 @@ exports.verifyAccount = async (req, res, next) => {
     user.verificationToken = undefined;
     user.verificationTokenExpires = undefined;
     await user.save();
-    
+
     // res.status(200).json({
     //   success: true,
     //   data: 'Account verified successfully'
@@ -156,7 +157,7 @@ exports.verifyAccount = async (req, res, next) => {
   } catch (err) {
 
     next(err);
-    
+
   }
 };
 
